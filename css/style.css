@@ -1,0 +1,686 @@
+/* ===== 全局样式 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #c0392b;
+    --primary-dark: #922b21;
+    --bg-dark: #1a1a2e;
+    --bg-card: #16213e;
+    --bg-board: #f5d89a;
+    --bg-board-dark: #d4a843;
+    --text-light: #eee;
+    --text-muted: #999;
+    --red-piece: #c0392b;
+    --red-piece-bg: #fdecea;
+    --black-piece: #1a1a1a;
+    --black-piece-bg: #e8e8e8;
+    --gold: #f39c12;
+    --success: #27ae60;
+    --shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== 屏幕切换 ===== */
+.screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+}
+.screen.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== 启动页 ===== */
+#splash-screen {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.splash-content {
+    padding: 2rem;
+    animation: fadeInUp 0.8s ease;
+}
+
+.logo-icon {
+    font-size: 5rem;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
+    animation: float 3s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+
+.small-logo {
+    font-size: 3rem;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.splash-content h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(to right, var(--gold), #e74c3c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.desc {
+    color: #777;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #e74c3c);
+    color: white;
+    border: none;
+    padding: 14px 48px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4);
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(192, 57, 43, 0.6);
+}
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.tips {
+    margin-top: 2rem;
+}
+.tip-item {
+    color: #666;
+    font-size: 0.8rem;
+    margin: 6px 0;
+}
+
+/* ===== 设置页 ===== */
+#setup-screen {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    justify-content: center;
+    align-items: center;
+}
+
+.setup-content {
+    width: 90%;
+    max-width: 420px;
+    padding: 2rem;
+    animation: fadeInUp 0.5s ease;
+}
+
+.setup-content h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.setting-group {
+    margin-bottom: 1.5rem;
+}
+.setting-group > label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.radio-group {
+    display: flex;
+    gap: 10px;
+}
+.radio-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+    justify-content: center;
+}
+.radio-label:hover {
+    border-color: rgba(255,255,255,0.3);
+}
+.radio-label.active {
+    border-color: var(--gold);
+    background: rgba(243, 156, 18, 0.1);
+}
+
+.piece-icon {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+.piece-icon.red {
+    background: var(--red-piece-bg);
+    color: var(--red-piece);
+    border: 2px solid var(--red-piece);
+}
+.piece-icon.black {
+    background: var(--black-piece-bg);
+    color: var(--black-piece);
+    border: 2px solid var(--black-piece);
+}
+.piece-icon.small {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+}
+
+.difficulty-group, .mode-group {
+    display: flex;
+    gap: 8px;
+}
+.diff-btn, .mode-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.85rem;
+}
+.diff-btn:hover, .mode-btn:hover {
+    border-color: rgba(255,255,255,0.3);
+}
+.diff-btn.active {
+    border-color: var(--gold);
+    background: rgba(243, 156, 18, 0.1);
+    color: var(--gold);
+}
+.mode-btn.active {
+    border-color: var(--primary);
+    background: rgba(192, 57, 43, 0.1);
+    color: #e74c3c;
+}
+
+.setup-content .btn-primary {
+    width: 100%;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* ===== 对战页 ===== */
+#game-screen {
+    background: var(--bg-dark);
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+.player-name {
+    font-weight: 600;
+}
+.capture-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.game-status {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(243, 156, 18, 0.15);
+    color: var(--gold);
+    font-weight: 500;
+}
+
+/* ===== 棋盘区域 ===== */
+.board-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 8px;
+    min-height: 0;
+}
+
+#board-canvas {
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    touch-action: none;
+}
+
+.thinking-overlay {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    padding: 16px 28px;
+    border-radius: 12px;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+    font-size: 0.9rem;
+}
+.thinking-overlay.show {
+    display: flex;
+}
+
+.thinking-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== 操作提示 ===== */
+.action-hint {
+    text-align: center;
+    padding: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    flex-shrink: 0;
+}
+
+/* ===== 走棋记录 ===== */
+.move-history {
+    background: var(--bg-card);
+    max-height: 60px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.history-title {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    padding: 4px 12px 0;
+}
+.history-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px 12px 6px;
+    font-size: 0.75rem;
+    overflow-y: auto;
+    max-height: 38px;
+}
+.history-list .move-item {
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+}
+.history-list .move-item.red {
+    color: #e74c3c;
+}
+.history-list .move-item.black {
+    color: #bbb;
+}
+
+/* ===== 底部工具栏 ===== */
+.game-toolbar {
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 4px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    background: var(--bg-card);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+}
+
+.tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 1.2rem;
+}
+.tool-btn span {
+    font-size: 0.65rem;
+}
+.tool-btn:hover, .tool-btn:active {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-light);
+}
+
+/* ===== 模态框 ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: fadeInUp 0.3s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.modal-header h3 {
+    font-size: 1.1rem;
+}
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+}
+
+/* ===== 摄像头 ===== */
+.camera-container {
+    position: relative;
+    background: #000;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+}
+.camera-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-guide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+.guide-frame {
+    width: 80%;
+    aspect-ratio: 1;
+    border: 2px dashed rgba(243, 156, 18, 0.6);
+    border-radius: 8px;
+}
+.camera-guide p {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    margin-top: 8px;
+}
+
+.camera-actions {
+    padding: 16px;
+    text-align: center;
+}
+.btn-capture {
+    background: linear-gradient(135deg, var(--primary), #e74c3c);
+    color: white;
+    border: none;
+    padding: 12px 36px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4);
+}
+
+.recognition-result {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.recognition-result h4 {
+    margin-bottom: 10px;
+}
+#recognition-preview {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow-x: auto;
+}
+.result-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* ===== 菜单 ===== */
+.menu-list {
+    padding: 8px;
+}
+.menu-item {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.menu-item:hover, .menu-item:active {
+    background: rgba(255,255,255,0.05);
+}
+
+/* ===== 关于 ===== */
+.about-content {
+    padding: 24px;
+    text-align: center;
+}
+.about-content h4 {
+    margin: 12px 0 8px;
+    font-size: 1.1rem;
+}
+.about-content p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+.about-content ul {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 16px;
+}
+.about-content li {
+    padding: 6px 0;
+    font-size: 0.85rem;
+    color: #bbb;
+}
+.copyright {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* ===== Toast提示 ===== */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    z-index: 200;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ===== 胜负弹窗 ===== */
+.game-over-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.game-over-content {
+    text-align: center;
+    animation: fadeInUp 0.5s ease;
+}
+.game-over-content .result-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+.game-over-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+.game-over-content p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+.game-over-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* ===== 棋子选中高亮（Canvas外的装饰） ===== */
+.highlight-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(39, 174, 96, 0.6);
+    pointer-events: none;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 360px) {
+    .splash-content h1 { font-size: 2rem; }
+    .logo-icon { font-size: 4rem; }
+    .btn-primary { padding: 12px 36px; font-size: 1rem; }
+}
+
+@media (min-width: 768px) {
+    .board-container {
+        padding: 16px;
+    }
+    .game-toolbar {
+        max-width: 500px;
+        margin: 0 auto;
+        width: 100%;
+    }
+}

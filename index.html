@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>象棋相机 - 实时对战</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 启动页 -->
+    <div id="splash-screen" class="screen active">
+        <div class="splash-content">
+            <div class="logo-icon">♚</div>
+            <h1>象棋相机</h1>
+            <p class="subtitle">📷 拍照识别 · 🤖 AI对弈</p>
+            <p class="desc">打开摄像头，对准棋盘拍照<br>AI自动识别局面并与你对弈</p>
+            <button id="btn-start" class="btn-primary">
+                <span>开始对战</span>
+            </button>
+            <div class="tips">
+                <div class="tip-item">📌 支持标准中国象棋棋盘</div>
+                <div class="tip-item">📌 AI自动分析最佳走法</div>
+                <div class="tip-item">📌 实时显示对战局面</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置页 -->
+    <div id="setup-screen" class="screen">
+        <div class="setup-content">
+            <h2>⚙️ 对战设置</h2>
+            <div class="setting-group">
+                <label>你执哪方？</label>
+                <div class="radio-group">
+                    <label class="radio-label active" data-value="red">
+                        <span class="piece-icon red">帅</span> 红方（先手）
+                    </label>
+                    <label class="radio-label" data-value="black">
+                        <span class="piece-icon black">将</span> 黑方（后手）
+                    </label>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>AI难度</label>
+                <div class="difficulty-group">
+                    <button class="diff-btn" data-level="1">入门</button>
+                    <button class="diff-btn active" data-level="2">普通</button>
+                    <button class="diff-btn" data-level="3">困难</button>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>对战模式</label>
+                <div class="mode-group">
+                    <button class="mode-btn active" data-mode="camera">📷 摄像头模式</button>
+                    <button class="mode-btn" data-mode="manual">✋ 手动模式</button>
+                </div>
+            </div>
+            <button id="btn-go" class="btn-primary">开始下棋 ♟</button>
+        </div>
+    </div>
+
+    <!-- 主对战页 -->
+    <div id="game-screen" class="screen">
+        <!-- 顶部状态栏 -->
+        <div class="game-header">
+            <div class="player-info black-side">
+                <span class="piece-icon small black">将</span>
+                <span class="player-name" id="black-name">黑方</span>
+                <span class="capture-count" id="black-captures"></span>
+            </div>
+            <div class="game-status" id="game-status">等待开始</div>
+            <div class="player-info red-side">
+                <span class="piece-icon small red">帅</span>
+                <span class="player-name" id="red-name">红方</span>
+                <span class="capture-count" id="red-captures"></span>
+            </div>
+        </div>
+
+        <!-- 棋盘区域 -->
+        <div class="board-container">
+            <canvas id="board-canvas"></canvas>
+            <!-- AI思考提示 -->
+            <div class="thinking-overlay" id="thinking-overlay">
+                <div class="thinking-spinner"></div>
+                <span>AI思考中...</span>
+            </div>
+        </div>
+
+        <!-- 操作提示 -->
+        <div class="action-hint" id="action-hint">
+            点击棋子选择，再点击目标位置走棋
+        </div>
+
+        <!-- 移动历史 -->
+        <div class="move-history" id="move-history">
+            <div class="history-title">走棋记录</div>
+            <div class="history-list" id="history-list"></div>
+        </div>
+
+        <!-- 底部工具栏 -->
+        <div class="game-toolbar">
+            <button class="tool-btn" id="btn-camera" title="拍照识别">
+                📷
+                <span>拍照</span>
+            </button>
+            <button class="tool-btn" id="btn-undo" title="悔棋">
+                ↩️
+                <span>悔棋</span>
+            </button>
+            <button class="tool-btn" id="btn-hint" title="提示">
+                💡
+                <span>提示</span>
+            </button>
+            <button class="tool-btn" id="btn-restart" title="重新开始">
+                🔄
+                <span>重来</span>
+            </button>
+            <button class="tool-btn" id="btn-menu" title="菜单">
+                ☰
+                <span>菜单</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 摄像头弹窗 -->
+    <div class="modal" id="camera-modal">
+        <div class="modal-content camera-view">
+            <div class="modal-header">
+                <h3>📷 拍照识别棋盘</h3>
+                <button class="close-btn" id="close-camera">&times;</button>
+            </div>
+            <div class="camera-container">
+                <video id="camera-video" autoplay playsinline></video>
+                <canvas id="camera-canvas" style="display:none;"></canvas>
+                <div class="camera-guide">
+                    <div class="guide-frame"></div>
+                    <p>请将棋盘对准框内</p>
+                </div>
+            </div>
+            <div class="camera-actions">
+                <button class="btn-capture" id="btn-capture">📸 拍照识别</button>
+            </div>
+            <div class="recognition-result" id="recognition-result" style="display:none;">
+                <h4>识别结果</h4>
+                <div id="recognition-preview"></div>
+                <div class="result-actions">
+                    <button class="btn-secondary" id="btn-retake">重新拍照</button>
+                    <button class="btn-primary" id="btn-apply">应用局面</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 菜单弹窗 -->
+    <div class="modal" id="menu-modal">
+        <div class="modal-content menu-view">
+            <div class="modal-header">
+                <h3>菜单</h3>
+                <button class="close-btn" id="close-menu">&times;</button>
+            </div>
+            <div class="menu-list">
+                <button class="menu-item" id="menu-new">🆕 新对局</button>
+                <button class="menu-item" id="menu-flip">🔄 翻转棋盘</button>
+                <button class="menu-item" id="menu-init">📋 初始局面</button>
+                <button class="menu-item" id="menu-empty">🗑️ 清空棋盘</button>
+                <button class="menu-item" id="menu-about">ℹ️ 关于</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于弹窗 -->
+    <div class="modal" id="about-modal">
+        <div class="modal-content about-view">
+            <div class="modal-header">
+                <h3>关于象棋相机</h3>
+                <button class="close-btn" id="close-about">&times;</button>
+            </div>
+            <div class="about-content">
+                <div class="logo-icon small-logo">♚</div>
+                <h4>象棋相机 v1.0</h4>
+                <p>一款支持摄像头识别的AI象棋对战工具</p>
+                <ul>
+                    <li>📷 摄像头拍照识别棋盘局面</li>
+                    <li>🤖 内置AI引擎，支持多难度</li>
+                    <li>♟ 完整中国象棋规则</li>
+                    <li>📱 手机/电脑均可使用</li>
+                </ul>
+                <p class="copyright">和公园大爷快乐下棋 ♟</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/chess-rules.js"></script>
+    <script src="js/chess-ai.js"></script>
+    <script src="js/chess-board.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
