@@ -1,5 +1,5 @@
 /**
- * 摄像头和棋盘识别模块
+ * 摄像头和实时视频模块
  */
 
 const CameraModule = (function() {
@@ -7,37 +7,51 @@ const CameraModule = (function() {
     let canvas = null;
     let ctx = null;
     let stream = null;
+    let isStreaming = false;
 
     // 初始化
     function init(videoEl, canvasEl) {
         video = videoEl;
-        canvas = canvasEl;
-        ctx = canvas.getContext('2d');
+        if (canvasEl) {
+            canvas = canvasEl;
+            ctx = canvas.getContext('2d');
+        }
     }
 
-    // 打开摄像头
-    async function startCamera() {
+    // 打开摄像头（实时视频流）
+    async function startCamera(options = {}) {
         try {
-            // 优先使用后置摄像头
             const constraints = {
                 video: {
-                    facingMode: { ideal: 'environment' },
-                    width: { ideal: 1280 },
-                    height: { ideal: 960 }
-                }
+                    facingMode: options.facingMode || { ideal: 'environment' },
+                    width: { ideal: options.width || 1280 },
+                    height: { ideal: options.height || 720 }
+                },
+                audio: false
             };
             
             stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
-            await video.play();
-            return true;
+            
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                    isStreaming = true;
+                    resolve(true);
+                };
+            });
         } catch (error) {
             console.error('摄像头启动失败:', error);
-            // 尝试使用前置摄像头
+            
+            // 尝试降级方案
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: false 
+                });
                 video.srcObject = stream;
                 await video.play();
+                isStreaming = true;
                 return true;
             } catch (e) {
                 console.error('所有摄像头启动失败:', e);
@@ -55,99 +69,122 @@ const CameraModule = (function() {
         if (video) {
             video.srcObject = null;
         }
+        isStreaming = false;
     }
 
-    // 拍照
-    function capturePhoto() {
+    // 拍照（从视频流中截取一帧）
+    function captureFrame() {
         if (!video || video.readyState !== 4) {
             return null;
+        }
+        
+        if (!canvas) {
+            canvas = document.createElement('canvas');
+            ctx = canvas.getContext('2d');
         }
         
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0);
         
-        return canvas.toDataURL('image/jpeg', 0.9);
-    }
-
-    // 简易棋盘识别（模拟）
-    // 实际应用中需要使用OpenCV.js或调用后端AI服务
-    function recognizeBoard(imageData) {
-        // 这里返回一个模拟的识别结果
-        // 实际项目中可以：
-        // 1. 使用 OpenCV.js 进行图像处理和棋盘检测
-        // 2. 调用后端 AI 服务（如 TensorFlow、YOLO）进行识别
-        // 3. 使用第三方象棋识别 API
-        
-        console.log('识别图像...');
-        
-        // 模拟识别过程，返回初始局面（实际应该返回识别结果）
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // 返回识别结果（这里用初始局面模拟）
-                const result = {
-                    success: true,
-                    board: ChessRules.getInitialBoard(),
-                    confidence: 0.85,
-                    message: '识别成功（演示模式）'
-                };
-                resolve(result);
-            }, 1500);
-        });
-    }
-
-    // 将图像转为灰度（用于预处理）
-    function toGrayscale(imageData) {
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-            data[i] = data[i + 1] = data[i + 2] = gray;
-        }
-        return imageData;
-    }
-
-    // 检测棋盘边界（简化版）
-    function detectBoardBoundary(ctx, width, height) {
-        // 实际实现需要：
-        // 1. 边缘检测（Canny）
-        // 2. 霍夫变换找直线
-        // 3. 找到棋盘的四个角点
-        // 4. 透视变换校正
-        
-        // 这里返回假设的棋盘区域
-        const margin = Math.min(width, height) * 0.1;
         return {
-            topLeft: { x: margin, y: margin },
-            topRight: { x: width - margin, y: margin },
-            bottomLeft: { x: margin, y: height - margin },
-            bottomRight: { x: width - margin, y: height - margin }
+            dataUrl: canvas.toDataURL('image/jpeg', 0.9),
+            imageData: ctx.getImageData(0, 0, canvas.width, canvas.height),
+            width: canvas.width,
+            height: canvas.height
         };
     }
 
-    // 从图像中提取棋盘（需要OpenCV.js）
-    // 这是一个占位函数，实际需要完整的图像处理
-    function extractBoard(imageData, boundary) {
-        // 透视变换将棋盘校正为正方形
-        // 然后分割成 9x10 的格子
-        // 对每个格子进行棋子识别
-        return null;
+    // 实时获取视频帧（用于连续分析）
+    function getVideoFrame() {
+        if (!video || video.readyState !== 4) {
+            return null;
+        }
+        return video;
     }
 
-    // 识别单个棋子（需要机器学习模型）
-    function recognizePiece(cellImage) {
-        // 使用预训练的模型识别棋子类型
-        // 可以是：
-        // 1. 模板匹配
-        // 2. CNN 分类器
-        // 3. OCR 识别棋子文字
-        return 0; // 空
+    // 检查是否正在运行
+    function isRunning() {
+        return isStreaming;
+    }
+
+    // 切换前后摄像头
+    async function switchCamera() {
+        const currentFacing = stream?.getVideoTracks()[0]?.getSettings()?.facingMode;
+        stopCamera();
+        
+        const newFacing = currentFacing === 'environment' ? 'user' : 'environment';
+        return await startCamera({ facingMode: newFacing });
+    }
+
+    // 模拟棋盘识别（实际应用需要真正的图像处理）
+    // 在真实项目中，这里应该使用：
+    // 1. TensorFlow.js + 训练好的模型
+    // 2. OpenCV.js 进行图像处理
+    // 3. 调用后端 AI 服务
+    function recognizeBoard(imageData) {
+        return new Promise((resolve) => {
+            console.log('分析棋盘图像...');
+            
+            // 模拟识别延迟
+            setTimeout(() => {
+                // 返回识别结果
+                // 实际应用中应该返回从图像中识别出的棋盘状态
+                resolve({
+                    success: true,
+                    board: null, // null 表示使用当前棋盘状态
+                    confidence: 0.85,
+                    message: '识别完成（演示模式）',
+                    detectedMove: null // 检测到的走法变化
+                });
+            }, 500);
+        });
+    }
+
+    // 检测棋盘变化（对比两帧之间的差异）
+    function detectBoardChange(prevBoard, currentBoard) {
+        if (!prevBoard || !currentBoard) return null;
+        
+        const changes = [];
+        for (let r = 0; r < 10; r++) {
+            for (let c = 0; c < 9; c++) {
+                if (prevBoard[r][c] !== currentBoard[r][c]) {
+                    changes.push({
+                        row: r,
+                        col: c,
+                        from: prevBoard[r][c],
+                        to: currentBoard[r][c]
+                    });
+                }
+            }
+        }
+        
+        // 分析变化，推断走法
+        if (changes.length === 2) {
+            const empty = changes.find(c => c.to === 0);
+            const filled = changes.find(c => c.from === 0 || c.to !== 0);
+            if (empty && filled) {
+                return {
+                    from: [empty.row, empty.col],
+                    to: [filled.row, filled.col],
+                    piece: empty.from,
+                    captured: filled.from !== 0 ? filled.from : 0
+                };
+            }
+        }
+        
+        return null;
     }
 
     return {
         init,
         startCamera,
         stopCamera,
-        capturePhoto,
-        recognizeBoard
+        captureFrame,
+        getVideoFrame,
+        isRunning,
+        switchCamera,
+        recognizeBoard,
+        detectBoardChange
     };
 })();

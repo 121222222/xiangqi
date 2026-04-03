@@ -93,8 +93,8 @@ html, body {
 }
 
 .subtitle {
-    font-size: 1.1rem;
-    color: var(--text-muted);
+    font-size: 1rem;
+    color: var(--gold);
     margin-bottom: 0.5rem;
 }
 
@@ -146,9 +146,9 @@ html, body {
     margin-top: 2rem;
 }
 .tip-item {
-    color: #666;
-    font-size: 0.8rem;
-    margin: 6px 0;
+    color: #888;
+    font-size: 0.85rem;
+    margin: 8px 0;
 }
 
 /* ===== 设置页 ===== */
@@ -232,11 +232,11 @@ html, body {
     font-size: 0.7rem;
 }
 
-.difficulty-group, .mode-group {
+.difficulty-group, .voice-group {
     display: flex;
     gap: 8px;
 }
-.diff-btn, .mode-btn {
+.diff-btn, .voice-btn {
     flex: 1;
     padding: 10px;
     border: 2px solid rgba(255,255,255,0.1);
@@ -247,7 +247,7 @@ html, body {
     transition: all 0.3s;
     font-size: 0.85rem;
 }
-.diff-btn:hover, .mode-btn:hover {
+.diff-btn:hover, .voice-btn:hover {
     border-color: rgba(255,255,255,0.3);
 }
 .diff-btn.active {
@@ -255,10 +255,10 @@ html, body {
     background: rgba(243, 156, 18, 0.1);
     color: var(--gold);
 }
-.mode-btn.active {
-    border-color: var(--primary);
-    background: rgba(192, 57, 43, 0.1);
-    color: #e74c3c;
+.voice-btn.active {
+    border-color: var(--success);
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--success);
 }
 
 .setup-content .btn-primary {
@@ -267,7 +267,7 @@ html, body {
     margin-top: 1rem;
 }
 
-/* ===== 对战页 ===== */
+/* ===== 游戏页 ===== */
 #game-screen {
     background: var(--bg-dark);
 }
@@ -288,12 +288,11 @@ html, body {
     gap: 6px;
     font-size: 0.85rem;
 }
+.player-avatar {
+    font-size: 1.5rem;
+}
 .player-name {
     font-weight: 600;
-}
-.capture-count {
-    font-size: 0.75rem;
-    color: var(--text-muted);
 }
 
 .game-status {
@@ -305,16 +304,167 @@ html, body {
     font-weight: 500;
 }
 
-/* ===== 棋盘区域 ===== */
-.board-container {
+/* ===== 主内容区 ===== */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* 视频区域 */
+.video-section {
+    flex-shrink: 0;
+    padding: 8px;
+    background: var(--bg-card);
+}
+
+.video-container {
+    position: relative;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    max-height: 180px;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    opacity: 0.5;
+}
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    animation: scan 2s ease-in-out infinite;
+}
+
+@keyframes scan {
+    0%, 100% { top: 0; opacity: 0; }
+    50% { top: 100%; opacity: 1; }
+}
+
+.video-status {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.7);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #e74c3c;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+.status-dot.active {
+    background: var(--success);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* AI建议框 */
+.ai-advice-box {
+    margin-top: 8px;
+    background: linear-gradient(135deg, #2d3436, #1a1a2e);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.advice-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--gold);
+}
+
+.ai-avatar {
+    font-size: 1.2rem;
+}
+
+.speak-btn {
+    margin-left: auto;
+    background: rgba(243, 156, 18, 0.2);
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+.speak-btn:hover {
+    background: rgba(243, 156, 18, 0.4);
+}
+.speak-btn.speaking {
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.advice-content {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.5;
+    min-height: 1.5em;
+}
+
+.advice-content .highlight {
+    color: var(--gold);
+    background: rgba(243, 156, 18, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* 棋盘区域 */
+.board-section {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
     padding: 8px;
     min-height: 0;
+}
+
+.board-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #board-canvas {
@@ -353,20 +503,10 @@ html, body {
     to { transform: rotate(360deg); }
 }
 
-/* ===== 操作提示 ===== */
-.action-hint {
-    text-align: center;
-    padding: 6px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    background: var(--bg-card);
-    flex-shrink: 0;
-}
-
-/* ===== 走棋记录 ===== */
+/* 走棋记录 */
 .move-history {
     background: var(--bg-card);
-    max-height: 60px;
+    max-height: 50px;
     overflow: hidden;
     flex-shrink: 0;
     border-top: 1px solid rgba(255,255,255,0.05);
@@ -383,7 +523,7 @@ html, body {
     padding: 4px 12px 6px;
     font-size: 0.75rem;
     overflow-y: auto;
-    max-height: 38px;
+    max-height: 30px;
 }
 .history-list .move-item {
     padding: 2px 6px;
@@ -397,7 +537,7 @@ html, body {
     color: #bbb;
 }
 
-/* ===== 底部工具栏 ===== */
+/* 底部工具栏 */
 .game-toolbar {
     display: flex;
     justify-content: space-around;
@@ -428,6 +568,16 @@ html, body {
 .tool-btn:hover, .tool-btn:active {
     background: rgba(255,255,255,0.05);
     color: var(--text-light);
+}
+
+.tool-btn.primary-action {
+    background: linear-gradient(135deg, var(--success), #2ecc71);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 12px;
+}
+.tool-btn.primary-action:hover {
+    transform: scale(1.05);
 }
 
 /* ===== 模态框 ===== */
@@ -477,82 +627,7 @@ html, body {
     line-height: 1;
 }
 
-/* ===== 摄像头 ===== */
-.camera-container {
-    position: relative;
-    background: #000;
-    aspect-ratio: 4/3;
-    overflow: hidden;
-}
-.camera-container video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.camera-guide {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
-.guide-frame {
-    width: 80%;
-    aspect-ratio: 1;
-    border: 2px dashed rgba(243, 156, 18, 0.6);
-    border-radius: 8px;
-}
-.camera-guide p {
-    color: rgba(255,255,255,0.7);
-    font-size: 0.8rem;
-    margin-top: 8px;
-}
-
-.camera-actions {
-    padding: 16px;
-    text-align: center;
-}
-.btn-capture {
-    background: linear-gradient(135deg, var(--primary), #e74c3c);
-    color: white;
-    border: none;
-    padding: 12px 36px;
-    border-radius: 50px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4);
-}
-
-.recognition-result {
-    padding: 16px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-}
-.recognition-result h4 {
-    margin-bottom: 10px;
-}
-#recognition-preview {
-    background: rgba(0,0,0,0.3);
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    font-size: 0.8rem;
-    line-height: 1.4;
-    overflow-x: auto;
-}
-.result-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-/* ===== 菜单 ===== */
+/* 菜单 */
 .menu-list {
     padding: 8px;
 }
@@ -573,7 +648,35 @@ html, body {
     background: rgba(255,255,255,0.05);
 }
 
-/* ===== 关于 ===== */
+/* 手动输入走法 */
+.move-input-content {
+    padding: 20px;
+    text-align: center;
+}
+.input-hint {
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.quick-btn {
+    padding: 10px 20px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.quick-btn:hover {
+    border-color: var(--gold);
+    background: rgba(243, 156, 18, 0.1);
+}
+
+/* 关于 */
 .about-content {
     padding: 24px;
     text-align: center;
@@ -657,30 +760,52 @@ html, body {
     justify-content: center;
 }
 
-/* ===== 棋子选中高亮（Canvas外的装饰） ===== */
-.highlight-dot {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(39, 174, 96, 0.6);
-    pointer-events: none;
-}
-
 /* ===== 响应式 ===== */
 @media (max-width: 360px) {
     .splash-content h1 { font-size: 2rem; }
     .logo-icon { font-size: 4rem; }
     .btn-primary { padding: 12px 36px; font-size: 1rem; }
+    .video-container { max-height: 140px; }
 }
 
 @media (min-width: 768px) {
-    .board-container {
-        padding: 16px;
+    .main-content {
+        flex-direction: row;
+    }
+    .video-section {
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+    }
+    .video-container {
+        max-height: none;
+        flex: 1;
+    }
+    .board-section {
+        width: 60%;
     }
     .game-toolbar {
-        max-width: 500px;
+        max-width: 600px;
         margin: 0 auto;
         width: 100%;
+    }
+}
+
+/* 横屏模式 */
+@media (orientation: landscape) and (max-height: 500px) {
+    .main-content {
+        flex-direction: row;
+    }
+    .video-section {
+        width: 45%;
+    }
+    .board-section {
+        width: 55%;
+    }
+    .video-container {
+        max-height: none;
+    }
+    .move-history {
+        display: none;
     }
 }
